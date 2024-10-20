@@ -1,13 +1,24 @@
 import ballerina/http;
 
-listener http:Listener searchServiceListener = new(5500);
+// Update allowed origins to include your IP address
 
-service / on searchServiceListener {
-    resource function post search(http:Caller caller, http:Request req) returns error? {
-        json searchData = check req.getJsonPayload();
-        string searchQuery = (check searchData.query).toString();
+@http:ServiceConfig {
+    cors: {
+        allowOrigins: ["*"],
+        allowCredentials: true,
+        allowHeaders: ["Content-Type"],
+        allowMethods: ["POST", "GET", "OPTIONS"],
+        maxAge: 3600
+    }
+}
+service / on new http:Listener(5570) {
+    // Handle all OPTIONS requests
+    resource function OPTIONS .() returns http:Response {
+        return new http:Response();
+    }
 
-        json response = { message: "You searched for " + searchQuery };
-        check caller->respond(response);
+    resource function post search(@http:Payload json payload) returns json|error {
+        string searchQuery = check payload.query.ensureType();
+        return { message: "You searched for: " + searchQuery };
     }
 }
