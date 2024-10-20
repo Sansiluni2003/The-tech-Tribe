@@ -2,7 +2,7 @@ import ballerina/http;
 import ballerina/io;
 import ballerina/log;
 
-listener http:Listener htmlServiceListener = new(5100);
+listener http:Listener htmlServiceListener = new(5110);
 
 service / on htmlServiceListener {
     resource function get index(http:Caller caller, http:Request req) returns error? {
